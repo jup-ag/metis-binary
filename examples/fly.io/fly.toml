@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "<APP_NAME>"
+app = "Biren Jupiter"
 primary_region = "sin"
 
 [build]
@@ -14,9 +14,9 @@ strategy = "bluegreen"
 
 [env]
 PORT = "8080"
-RPC_URL = "<RPC_URL>"
-# YELLOWSTONE_GRPC_ENDPOINT = "" # Optional 
-# YELLOWSTONE_GRPC_X_TOKEN = "" # Optional
+RPC_URL = "https://virulent-neat-uranium.solana-mainnet.quiknode.pro/34c341f57c26494a7a3422a6a42291e9e6589be5"
+YELLOWSTONE_GRPC_ENDPOINT = "https://basic.grpc.solanavibestation.com" 
+YELLOWSTONE_GRPC_X_TOKEN = "f1472ab97472ff4769418168d9f192f0"
 
 [http_service]
 internal_port = 8080
