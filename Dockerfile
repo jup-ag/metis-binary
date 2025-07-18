@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 debian:bookworm-slim
+FROM --platform=linux/amd64 debian:stable-backports
 
 RUN apt-get update && apt-get install unzip openssl ca-certificates -y
 COPY ./jupiter-swap-api-x86_64-unknown-linux-gnu.zip ./jupiter-swap-api-x86_64-unknown-linux-gnu.zip
