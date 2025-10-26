@@ -1,7 +1,5 @@
-# jupiter-swap-api
+# Metis Binary (No longer maintained)
 
-The binary of the Jupiter V6 Swap API
+This binary offers the Metis routing algorithm for people to swap on Solana using the Jupiter program.
 
-Refer to [self-hosted](https://station.jup.ag/docs/apis/self-hosted) for documentation
-
-To receive updates from telegram, can join https://t.me/jup_dev
+If you want to offer a swap function for your users, you should check out the [Jupiter Ultra API](https://dev.jup.ag/docs/ultra).
