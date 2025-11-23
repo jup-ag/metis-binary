@@ -1,41 +1,69 @@
-# fly.toml app configuration file generated for test-metis-binary on 2023-12-04T14:14:21+08:00
+# fly.toml app configuration file for high-performance crypto data service.
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
+# --- Application Identity ---
 app = "<APP_NAME>"
+# Primary region for deployment (e.g., sin = Singapore).
 primary_region = "sin"
 
+# --- Build and Deployment ---
 [build]
+# Specifies the Docker image to be deployed from the GitHub Container Registry.
 image = "ghcr.io/jup-ag/metis-binary:latest"
 
 [deploy]
+# Uses Blue/Green strategy to ensure zero-downtime updates during deployments.
 strategy = "bluegreen"
 
+# --- Environment Variables (Secrets should be injected via 'fly secrets') ---
 [env]
+# Internal port the application listens on.
 PORT = "8080"
+# Solana RPC endpoint URL (CRITICAL: Should be a secret, not hardcoded).
 RPC_URL = "<RPC_URL>"
-# YELLOWSTONE_GRPC_ENDPOINT = "" # Optional 
-# YELLOWSTONE_GRPC_X_TOKEN = "" # Optional
+# Optional gRPC endpoint for Yellowstone data streaming (Should be a secret).
+# YELLOWSTONE_GRPC_ENDPOINT = ""
+# Optional authentication token for the gRPC endpoint (CRITICAL: Must be a secret).
+# YELLOWSTONE_GRPC_X_TOKEN = ""
 
+# --- HTTP Service Configuration ---
 [http_service]
 internal_port = 8080
+# Machines are never automatically stopped, ensuring fast response times (hot standby).
 auto_stop_machines = "off"
+# Machines are started automatically when traffic arrives.
 auto_start_machines = true
+# Guarantees that at least one instance is always running for high availability.
 min_machines_running = 1
+
+# Concurrency limits to manage load per machine.
 [http_service.concurrency]
+# Concurrency measured by simultaneous HTTP requests.
 type = "requests"
+# Absolute maximum simultaneous requests allowed per machine.
 hard_limit = 30
+# Soft limit for concurrency, triggering scaling events above this threshold.
 soft_limit = 10
 
+# Health check configuration to monitor application readiness.
 [[http_service.checks]]
+# Frequency of checks (every 30 seconds).
 interval = "30s"
+# Time to wait for a response before considering it failed (5 seconds).
 timeout = "5s"
+# Initial period to allow the machine to start before checking its health.
 grace_period = "20s"
 method = "GET"
+# Path to check. This endpoint should verify database connectivity and core logic.
 path = "/program-id-to-label"
 
+# --- Virtual Machine Resources (High Performance / High Cost) ---
 [[vm]]
+# Uses high-performance dedicated CPUs.
 cpu_kind = "performance"
+# 8 dedicated CPU cores. Necessary for heavy computational loads (e.g., indexing, validation).
 cpus = 8
+# 16 GB of memory. Sized for large in-memory caches or handling substantial data streams.
 memory_mb = 16384
