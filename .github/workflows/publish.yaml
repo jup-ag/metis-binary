@@ -23,10 +23,10 @@ jobs:
       # 
     steps:
       - uses: actions/checkout@v4
-      - uses: dsaltares/fetch-gh-release-asset@master
+      - uses: dsaltares/fetch-gh-release-asset@1.1.2
         with:
           repo: ${{ github.repository }}
-          version: 'latest'
+          version: tags/${{ github.ref_name }}
           file: 'metis-binary-x86_64-unknown-linux-gnu.zip'
           token: ${{ secrets.GITHUB_TOKEN }}
       # Uses the `docker/login-action` action to log in to the Container registry registry using the account and password that will publish the packages. Once published, the packages are scoped to the account defined here.
