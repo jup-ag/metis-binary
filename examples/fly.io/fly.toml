@@ -1,41 +1,58 @@
-# fly.toml app configuration file generated for test-metis-binary on 2023-12-04T14:14:21+08:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# fly.toml app configuration file for Solana Metis Binary service.
+# Generated on 2023-12-04T14:14:21+08:00
 
-app = "<APP_NAME>"
-primary_region = "sin"
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+
+app = "test-metis-binary" # Use the actual application name here
+primary_region = "sin"     # Singapore region (default deployment)
 
 [build]
+# The Docker image to use for the build/deployment.
 image = "ghcr.io/jup-ag/metis-binary:latest"
 
 [deploy]
+# Use the blue/green deployment strategy for zero downtime updates.
 strategy = "bluegreen"
 
 [env]
+# Define environment variables. Sensitive data (RPC_URL, tokens) should be set via 'fly secrets'.
 PORT = "8080"
-RPC_URL = "<RPC_URL>"
-# YELLOWSTONE_GRPC_ENDPOINT = "" # Optional 
-# YELLOWSTONE_GRPC_X_TOKEN = "" # Optional
+# RPC_URL must be set via 'fly secrets set RPC_URL=...'
+# RPC_URL = "<RPC_URL>" 
+
+# Optional environment variables for external service integration (e.g., Yellowstone gRPC)
+# YELLOWSTONE_GRPC_ENDPOINT = ""
+# YELLOWSTONE_GRPC_X_TOKEN = ""
 
 [http_service]
+# The internal port the application listens on.
 internal_port = 8080
+# Automatically scale down to zero machines if idle (set to "off" to maintain minimum running).
 auto_stop_machines = "off"
+# Automatically scale up to the minimum running machines when traffic arrives.
 auto_start_machines = true
+# Maintain at least one machine running to minimize cold starts.
 min_machines_running = 1
+
 [http_service.concurrency]
+# Concurrency type is based on incoming requests.
 type = "requests"
+# Maximum concurrent requests per machine before queuing or scaling.
 hard_limit = 30
+# Soft limit for concurrent requests before Fly starts considering scaling out.
 soft_limit = 10
 
 [[http_service.checks]]
+# Health check configuration for the service.
 interval = "30s"
 timeout = "5s"
 grace_period = "20s"
 method = "GET"
+# Path to the application's health/status endpoint.
 path = "/program-id-to-label"
 
 [[vm]]
+# Allocation of high-performance resources (dedicated CPUs).
 cpu_kind = "performance"
 cpus = 8
-memory_mb = 16384
+memory_mb = 16384 # 16GB of RAM
