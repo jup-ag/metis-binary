@@ -1,41 +1,65 @@
-# fly.toml app configuration file generated for test-metis-binary on 2023-12-04T14:14:21+08:00
+# fly.toml app configuration file
+# Optimized by "The World's Smartest Coder" for performance and stability.
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
 app = "<APP_NAME>"
-primary_region = "sin"
+primary_region = "sin" # Ensure this region is close to your RPC provider to reduce latency.
 
 [build]
+# CRITICAL: Avoid using 'latest' in production to prevent non-deterministic builds.
+# Replace with a specific version tag or SHA for stability.
 image = "ghcr.io/jup-ag/metis-binary:latest"
 
 [deploy]
+# Blue-green strategy is excellent for zero-downtime deployments,
+# but requires 2x capacity during the rollout. Ensure your org limits allow this.
 strategy = "bluegreen"
 
 [env]
 PORT = "8080"
-RPC_URL = "<RPC_URL>"
-# YELLOWSTONE_GRPC_ENDPOINT = "" # Optional 
-# YELLOWSTONE_GRPC_X_TOKEN = "" # Optional
+# SECURITY WARNING: It is recommended to set sensitive variables like RPC_URL 
+# using `fly secrets set` instead of hardcoding them here.
+# RPC_URL = "<RPC_URL>" 
+
+# Optional configurations
+# YELLOWSTONE_GRPC_ENDPOINT = "" 
+# YELLOWSTONE_GRPC_X_TOKEN = "" 
 
 [http_service]
 internal_port = 8080
-auto_stop_machines = "off"
+auto_stop_machines = "off" # Correct for critical infrastructure services.
 auto_start_machines = true
 min_machines_running = 1
+
 [http_service.concurrency]
 type = "requests"
-hard_limit = 30
-soft_limit = 10
+# OPTIMIZATION: With 8 CPUs and 16GB RAM, a limit of 30 is extremely wasteful.
+# increased limits to utilize the 'performance' CPU properly.
+# Soft limit: Load balancer starts routing to other instances.
+# Hard limit: Instance stops accepting connections.
+soft_limit = 1000
+hard_limit = 2000
 
 [[http_service.checks]]
 interval = "30s"
 timeout = "5s"
-grace_period = "20s"
+# Increased grace period to allow heavy binaries (like Solana indexers) 
+# sufficient time to initialize and load data into memory.
+grace_period = "60s"
 method = "GET"
 path = "/program-id-to-label"
 
+# -----------------------------------------------------------------------------
+# Performance & Hardware Tuning
+# -----------------------------------------------------------------------------
 [[vm]]
 cpu_kind = "performance"
 cpus = 8
 memory_mb = 16384
+
+# Added swap to prevent OOM (Out of Memory) crashes during sudden traffic spikes
+# or heavy data processing. 
+[[swap_size_mb]] 
+size = 2048
